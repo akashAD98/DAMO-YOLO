@@ -3,13 +3,31 @@
 import glob
 import re
 from os import path
-
+import io
 import setuptools
 import torch
 from torch.utils.cpp_extension import CppExtension
 
 torch_ver = [int(x) for x in torch.__version__.split('.')[:2]]
 assert torch_ver >= [1, 7], 'Requires PyTorch >= 1.7'
+
+
+def get_long_description():
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    with io.open(os.path.join(base_dir, "README.md"), encoding="utf-8") as f:
+        return f.read()
+
+
+def get_requirements():
+    with open("requirements.txt") as f:
+        return f.read().splitlines()
+
+
+def get_version():
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    version_file = os.path.join(current_dir, "yolov7", "__init__.py")
+    with io.open(version_file, encoding="utf-8") as f:
+        return re.search(r'^__version__ = [\'"]([^\'"]*)[\'"]', f.read(), re.M).group(1)
 
 
 def get_extensions():
@@ -48,9 +66,18 @@ with open('README.md', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 setuptools.setup(
-    name='damo',
+    name='damo_yolo',
     version=version,
-    author='basedet team',
+    author='Akash_Desai',
+    
+    
+    license="MIT",
+    description="Packaged version of the DAMO repository",
+    long_description=get_long_description(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/akashAD98/DAMO-YOLO",
+    packages=setuptools.find_packages(),
+    
     python_requires='>=3.6',
     long_description=long_description,
     ext_modules=get_extensions(),
@@ -61,3 +88,4 @@ setuptools.setup(
     cmdclass={'build_ext': torch.utils.cpp_extension.BuildExtension},
     packages=setuptools.find_packages(),
 )
+
